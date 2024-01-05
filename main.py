@@ -1,9 +1,13 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 from typing import Union
 from fastapi import FastAPI
+import firebase_admin
 
+from settings import Settings
+
+# Firebase
+firebase_admin.initialize_app(Settings.firebase.credentials)
+
+# FastAPI app
 app = FastAPI()
 
 @app.get('/')
