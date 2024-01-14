@@ -5,14 +5,18 @@ from firebase_admin import credentials
 
 load_dotenv()
 
-class Settings:
-    class JWTSettings:
+class Config:
+    class JWTConfig:
         secret_key = os.environ.get('SECRET_KEY')
         expiration_time = 120
         
-    class FirebaseSettings:
+    class FirebaseConfig:
         credentials = credentials.Certificate('keys/firebase.json')
     
-    jwt = JWTSettings()
-    firebase = FirebaseSettings()
+    class DatabaseConfig:
+        url = os.environ.get('DATABASE_URL')
+    
+    jwt = JWTConfig()
+    firebase = FirebaseConfig()
+    database = DatabaseConfig()
     
