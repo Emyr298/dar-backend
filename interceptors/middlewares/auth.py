@@ -2,7 +2,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from enums.auth import AuthStatus
-from utils.authentication import get_user_from_token
+from services.auth_service import get_user_from_token, get_email_from_token
 from exceptions.exceptions import UnregisteredException
 
 class AuthMiddleware(BaseHTTPMiddleware):
@@ -11,12 +11,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         token = request.headers.get('Authorization', '')[len('Bearer '):]
+        
+        try:
+            email = get_email_from_token(token)
+            request.state.email = email
+        except Exception:
+            request.state.email = None
+        
         try:
             request.state.user = get_user_from_token(token)
             request.state.auth_status = AuthStatus.REGISTERED
         except UnregisteredException:
+            request.state.user = None
             request.state.auth_status = AuthStatus.UNREGISTERED
-        except:
+        except Exception:
             request.state.user = None
             request.state.auth_status = AuthStatus.GUEST
+            
         return await call_next(request)

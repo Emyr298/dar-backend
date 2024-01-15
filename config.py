@@ -1,9 +1,13 @@
 import os
 from dotenv import load_dotenv
-import firebase_admin
 from firebase_admin import credentials
+from enum import Enum, auto
 
 load_dotenv()
+
+class Environment(Enum):
+    PRODUCTION = 'production'
+    DEBUG = 'debug'
 
 class Config:
     class JWTConfig:
@@ -16,6 +20,7 @@ class Config:
     class DatabaseConfig:
         url = os.environ.get('DATABASE_URL')
     
+    environment = Environment.PRODUCTION if os.getenv('ENVIRONMENT') == 'production' else Environment.DEBUG
     jwt = JWTConfig()
     firebase = FirebaseConfig()
     database = DatabaseConfig()

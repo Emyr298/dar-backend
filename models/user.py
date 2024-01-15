@@ -1,7 +1,15 @@
 
 from sqlalchemy import Column, ForeignKey, String, Float, CheckConstraint
+from sqlalchemy.orm import Session
+from enum import Enum
 
 from database import Base, get_session
+
+class UserRole(str, Enum):
+    BASE_USER = 'user'
+    STANDARD = 'standard'
+    RESPONDER = 'responder'
+    ADMIN = 'admin'
 
 class User(Base):
     __tablename__ = 'user'
@@ -12,46 +20,36 @@ class User(Base):
     role = Column(String(64))
     
     __mapper_args__ = {
-        'polymorphic_identity': 'user',
+        'polymorphic_identity': UserRole.BASE_USER,
         'polymorphic_on': 'role'
     }
     
-    def get_by_email(email: str | None):
-        db = get_session()
-        if not email:
-            return None
-        return db.query(User).filter_by(email=email).first()
-    
-    def get_by_username(username: str):
-        db = get_session()
-        return db.query(User).filter_by(username=username).first()
-    
 class StandardUser(User):
-    __tablename__ = 'standarduser'
+    __tablename__ = 'standard_user'
     
     username = Column(ForeignKey('user.username'), primary_key=True)
-    report_rating = Column(Float, CheckConstraint('report_rating >= 0 AND report_rating <= 5'))
+    report_rating = Column(Float, CheckConstraint('report_rating >= 0 AND report_rating <= 5'), default=0)
     
     __mapper_args__ = {
-        'polymorphic_identity': 'standard',
+        'polymorphic_identity': UserRole.STANDARD,
     }
 
 class ResponderUser(User):
-    __tablename__ = 'responderuser'
+    __tablename__ = 'responder_user'
     
     username = Column(ForeignKey('user.username'), primary_key=True)
-    respond_rating = Column(Float, CheckConstraint('respond_rating >= 0 AND respond_rating <= 5'))
+    respond_rating = Column(Float, CheckConstraint('respond_rating >= 0 AND respond_rating <= 5'), default=0)
     
     __mapper_args__ = {
-        'polymorphic_identity': 'responder',
+        'polymorphic_identity': UserRole.RESPONDER,
     }
     
 class AdminUser(User):
-    __tablename__ = 'adminuser'
+    __tablename__ = 'admin_user'
     
     username = Column(ForeignKey('user.username'), primary_key=True)
     
     __mapper_args__ = {
-        'polymorphic_identity': 'admin',
+        'polymorphic_identity': UserRole.ADMIN,
     }
     
