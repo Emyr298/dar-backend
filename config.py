@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from firebase_admin import credentials
 from enum import Enum, auto
+from passlib.context import CryptContext
 
 load_dotenv()
 
@@ -24,4 +25,8 @@ class Config:
     jwt = JWTConfig()
     firebase = FirebaseConfig()
     database = DatabaseConfig()
+    password_context = CryptContext(
+        schemes=['bcrypt'],
+        deprecated='auto'
+    )
     
