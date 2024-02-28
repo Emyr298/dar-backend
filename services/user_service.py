@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
 from models.user import User, StandardUser, ResponderUser, AdminUser
-from dto.user import StandardUserCreateDTO, ResponderUserCreateDTO, AdminUserCreateDTO
+from dto.user import UserCreateDTO, ResponderUserCreateDTO, AdminUserCreateDTO
+from utils.crypto import hash_password
 
 def get_user_by_email(session: Session, email: str | None):
     if not email:
@@ -11,22 +12,14 @@ def get_user_by_email(session: Session, email: str | None):
 def get_user_by_username(session: Session, username: str):
     return session.query(User).filter_by(username=username).first()
 
-def create_standard_user(session: Session, data: StandardUserCreateDTO, email: str):
-    user = StandardUser(**data.model_dump(), email=email)
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
-
-def create_responder_user(session: Session, data: ResponderUserCreateDTO, email: str):
-    user = ResponderUser(**data.model_dump(), email=email)
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
-
-def create_admin_user(session: Session, data: AdminUserCreateDTO, email: str):
-    user = AdminUser(**data.model_dump(), email=email)
+def create_user(session: Session, data: UserCreateDTO, email: str):
+    data.password = hash_password(data.password)
+    if isinstance(data, AdminUserCreateDTO):
+        user = AdminUser(**data.model_dump(), email=email)
+    elif isinstance(data, ResponderUserCreateDTO):
+        user = ResponderUser(**data.model_dump(), email=email)
+    else:
+        user = StandardUser(**data.model_dump(), email=email)
     session.add(user)
     session.commit()
     session.refresh(user)

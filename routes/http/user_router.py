@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_session
 from exceptions.exceptions import UserNotFoundException
 
-from services.user_service import get_user_by_username, create_standard_user, create_responder_user, create_admin_user, delete_user
+from services.user_service import get_user_by_username, create_user, delete_user
 
 from models.user import UserRole
 from dto.user import StandardUserDTO, ResponderUserDTO, AdminUserDTO, StandardUserCreateDTO, ResponderUserCreateDTO, AdminUserCreateDTO
@@ -26,17 +26,17 @@ def get_user(username: str, session: Session = Depends(get_session)):
 @router.post('/standard', response_model=StandardUserDTO)
 def register_standard_user(request: Request, data: StandardUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
-    return create_standard_user(session, data, email)
+    return create_user(session, data, email)
     
 @router.post('/responder', response_model=StandardUserDTO)
 def register_responder_user(request: Request, data: ResponderUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
-    return create_responder_user(session, data, email)
+    return create_user(session, data, email)
 
 @router.post('/admin', response_model=StandardUserDTO)
 def register_admin_user(request: Request, data: AdminUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
-    return create_admin_user(session, data, email)
+    return create_user(session, data, email)
 
 @router.delete('/')
 def delete_current_user(request: Request, session: Session = Depends(get_session)):
