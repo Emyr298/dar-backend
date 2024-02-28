@@ -24,22 +24,22 @@ def get_user(username: str, session: Session = Depends(get_session)):
     return StandardUserDTO.model_validate(user)
 
 @router.post('/standard', response_model=StandardUserDTO)
-def register_standard_user(request: Request, data: StandardUserCreateDTO, session: Depends(get_session)):
+def register_standard_user(request: Request, data: StandardUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
     return create_standard_user(session, data, email)
     
 @router.post('/responder', response_model=StandardUserDTO)
-def register_responder_user(request: Request, data: ResponderUserCreateDTO, session: Depends(get_session)):
+def register_responder_user(request: Request, data: ResponderUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
     return create_responder_user(session, data, email)
 
 @router.post('/admin', response_model=StandardUserDTO)
-def register_admin_user(request: Request, data: AdminUserCreateDTO, session: Depends(get_session)):
+def register_admin_user(request: Request, data: AdminUserCreateDTO, session: Session = Depends(get_session)):
     email = str(request.state.email)
     return create_admin_user(session, data, email)
 
 @router.delete('/')
-def delete_current_user(request: Request, session: Depends(get_session)):
+def delete_current_user(request: Request, session: Session = Depends(get_session)):
     if request.state.user is not None:
         delete_user(session, request.state.user)
     return {'detail': 'success'}
